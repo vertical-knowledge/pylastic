@@ -159,7 +159,6 @@ def wait_for_index_green(elastic_client, index):
     :param index: Index to check status on
     :return: None
     """
-    print repr(index_exists)
     if not index_exists(elastic_client, index):
         raise Exception('Index does not exist')
 
