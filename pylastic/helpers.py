@@ -1,8 +1,10 @@
-from elasticsearch.exceptions import AuthorizationException
-
 """
 Functions which wrap the Elastic client for convenience
 """
+
+
+from elasticsearch.exceptions import AuthorizationException
+
 
 STATUS_GREEN = 'green'
 
@@ -167,4 +169,3 @@ def wait_for_index_green(elastic_client, index):
     response = elastic_client.cluster.health(index=index, wait_for_status=STATUS_GREEN)
     if not response or not (response.get('status', '') == STATUS_GREEN):
         raise Exception('Index is not {}'.format(STATUS_GREEN))
-
