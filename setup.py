@@ -1,6 +1,6 @@
-__pkg_name__ = 'pylastic'
-
 from setuptools import setup, find_packages
+
+__pkg_name__ = 'pylastic'
 
 import os
 
@@ -9,14 +9,13 @@ version = '0.0.1'
 base_dir = os.path.dirname(__file__)
 
 setup(
-    author='Vertical Knowledge',
-    author_email='kyle.amos@vertical-knowledge.com',
+    author='Kyle Amos',
+    author_email='kylebamos@gmail.com',
     name='pylastic',
     version=version,
     packages=find_packages(exclude=['tests', 'tests.*']),
     include_package_data=True,
-    description='Python Elastic',
-    # long_description=long_description,
+    description='Helper Functions for the Python Elastic Client',
     install_requires=[
         'elasticsearch'
     ],
@@ -32,5 +31,5 @@ setup(
         'elasticsearch',
         'mock'
     ],
-    test_suite="tests"
+    test_suite='tests'
 )
