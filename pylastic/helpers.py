@@ -65,6 +65,7 @@ def open_indices(elastic_client, indices):
             open_index_failures.append(index)
     return open_index_failures
 
+
 def create_index(elastic_client, index, body):
     """
     Create a new index in Elastic with the provided settings and mapping
@@ -78,6 +79,7 @@ def create_index(elastic_client, index, body):
     if response is None:
         raise Exception('Problem occurred creating index. Index: {}'.format(index))
     return response
+
 
 def update_alias(elastic_client, alias, index, action):
     """
@@ -126,17 +128,7 @@ def remove_alias(elastic_client, alias, index):
     return update_alias(elastic_client, alias, index, 'remove')
 
 
-def index_exists(elastic_client, index):
-    """
-    Check if an Elastic index exists
-    :param elastic_client: Elastic client
-    :param index: Index to check
-    :return: Boolean
-    """
-    return elastic_client.indices.exists(index=index)
-
-
-def index_closed(elastic_client, index):
+def is_index_closed(elastic_client, index):
     """
     Check if an Elastic index is closed
     :param elastic_client: Elastic client
@@ -159,10 +151,10 @@ def wait_for_index_green(elastic_client, index):
     :param index: Index to check status on
     :return: None
     """
-    if not index_exists(elastic_client, index):
+    if not elastic_client.indices.exists(index=index):
         raise Exception('Index does not exist')
 
-    if index_closed(elastic_client, index):
+    if is_index_closed(elastic_client, index):
         raise Exception('Index is closed')
 
     response = elastic_client.cluster.health(index=index, wait_for_status=STATUS_GREEN)

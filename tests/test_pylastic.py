@@ -1,7 +1,7 @@
 from elasticsearch.exceptions import AuthorizationException, NotFoundError
 from pylastic import close_index, close_indices, open_index, \
     open_indices, create_index, update_alias, remove_alias, add_alias, \
-    index_exists, index_closed, wait_for_index_green
+    is_index_closed, wait_for_index_green
 from mock import Mock, patch
 from unittest import TestCase
 
@@ -179,20 +179,9 @@ class TestRemoveAlias(PylasticTest):
                                                   'remove')
 
 
-class TestIndexExists(PylasticTest):
+class TestIsIndexClosed(PylasticTest):
     """
-    Test index_exists
-    """
-
-
-    def test_calls_elastic_client_with_correct_data(self):
-        index_exists(self.elastic_client, 'foo')
-        self.elastic_client.indices.exists.assert_called_once_with(index='foo')
-
-
-class TestIndexClosed(PylasticTest):
-    """
-    Test index_closed
+    Test is_index_closed
     """
 
 
@@ -200,18 +189,18 @@ class TestIndexClosed(PylasticTest):
         def stats(index):
             raise AuthorizationException(403, 'IndexClosedException')
         self.elastic_client.indices.stats = stats
-        self.assertTrue(index_closed(self.elastic_client, 'foo'))
+        self.assertTrue(is_index_closed(self.elastic_client, 'foo'))
 
 
     def test_returns_false_if_index_open(self):
-        self.assertFalse(index_closed(self.elastic_client, 'foo'))
+        self.assertFalse(is_index_closed(self.elastic_client, 'foo'))
 
 
     def test_raises_exception_if_index_does_not_exist(self):
         def stats(index):
             raise NotFoundError(404, 'IndexMissingException')
         self.elastic_client.indices.stats = stats
-        self.assertRaises(NotFoundError, index_closed, self.elastic_client, 'foo')
+        self.assertRaises(NotFoundError, is_index_closed, self.elastic_client, 'foo')
 
 
 class TestWaitForIndexGreen(PylasticTest):
@@ -224,33 +213,29 @@ class TestWaitForIndexGreen(PylasticTest):
         self.elastic_client.cluster.health.return_value = {'status': 'green'}
 
 
-    @patch('pylastic.helpers.index_exists', lambda x, y: True)
-    @patch('pylastic.helpers.index_closed', lambda x, y: False)
+    @patch('pylastic.helpers.is_index_closed', lambda x, y: False)
     def test_returns_when_index_green(self):
         self.assertEqual(None, wait_for_index_green(self.elastic_client, 'foo'))
 
 
-    @patch('pylastic.helpers.index_exists', lambda x, y: False)
-    @patch('pylastic.helpers.index_closed', lambda x, y: False)
+    @patch('pylastic.helpers.is_index_closed', lambda x, y: False)
     def test_raises_exception_if_index_does_not_exist(self):
+        self.elastic_client.indices.exists.return_value = False
         self.assertRaises(Exception, wait_for_index_green, self.elastic_client, 'foo')
 
 
-    @patch('pylastic.helpers.index_exists', lambda x, y: True)
-    @patch('pylastic.helpers.index_closed', lambda x, y: True)
+    @patch('pylastic.helpers.is_index_closed', lambda x, y: True)
     def test_raises_exception_if_index_is_closed(self):
         self.assertRaises(Exception, wait_for_index_green, self.elastic_client, 'foo')
 
 
-    @patch('pylastic.helpers.index_exists', lambda x, y: True)
-    @patch('pylastic.helpers.index_closed', lambda x, y: False)
+    @patch('pylastic.helpers.is_index_closed', lambda x, y: False)
     def test_raises_exception_if_index_is_not_green(self):
         self.elastic_client.cluster.health.return_value = {'status': 'red'}
         self.assertRaises(Exception, wait_for_index_green, self.elastic_client, 'foo')
 
 
-    @patch('pylastic.helpers.index_exists', lambda x, y: True)
-    @patch('pylastic.helpers.index_closed', lambda x, y: False)
+    @patch('pylastic.helpers.is_index_closed', lambda x, y: False)
     def test_raises_exception_if_no_response(self):
         self.elastic_client.cluster.health.return_value = None
         self.assertRaises(Exception, wait_for_index_green, self.elastic_client, 'foo')
