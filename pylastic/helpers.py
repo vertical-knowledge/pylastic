@@ -4,6 +4,7 @@ Functions which wrap the Elastic client for convenience
 
 
 from elasticsearch.exceptions import AuthorizationException
+from patched_elastic import scan, bulk
 
 
 STATUS_GREEN = 'green'
