@@ -32,7 +32,7 @@ def close_indices(elastic_client, indices):
     close_index_failures = []
     for index in indices:
         try:
-            close_index(index)
+            close_index(elastic_client, index)
         except:
             close_index_failures.append(index)
     return close_index_failures
@@ -61,7 +61,7 @@ def open_indices(elastic_client, indices):
     open_index_failures = []
     for index in indices:
         try:
-            open_index(index)
+            open_index(elastic_client, index)
         except:
             open_index_failures.append(index)
     return open_index_failures
