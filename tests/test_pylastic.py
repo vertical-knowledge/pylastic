@@ -50,6 +50,7 @@ class TestCloseIndices(PylasticTest):
         indices = range(5)
         failures = close_indices(self.elastic_client, indices)
         self.assertEqual(5, mock_close_index.call_count)
+        self.assertEqual(0, len(failures))
 
 
     def test_returns_failures_instead_of_raising_exception(self):
@@ -94,6 +95,7 @@ class TestOpenIndices(PylasticTest):
         indices = range(5)
         failures = open_indices(self.elastic_client, indices)
         self.assertEqual(5, mock_open_index.call_count)
+        self.assertEqual(0, len(failures))
 
 
     def test_returns_failures_instead_of_raising_exception(self):
@@ -175,6 +177,7 @@ class TestAddAliases(PylasticTest):
         indices = range(5)
         failures = add_aliases(self.elastic_client, 'foo', indices)
         self.assertEqual(5, mock_add_alias.call_count)
+        self.assertEqual(0, len(failures))
 
 
     def test_returns_failures_instead_of_raising_exception(self):
@@ -211,6 +214,7 @@ class TestRemoveAliases(PylasticTest):
         indices = range(5)
         failures = remove_aliases(self.elastic_client, 'foo', indices)
         self.assertEqual(5, mock_remove_alias.call_count)
+        self.assertEqual(0, len(failures))
 
 
     def test_returns_failures_instead_of_raising_exception(self):
