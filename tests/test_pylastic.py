@@ -1,7 +1,7 @@
 from elasticsearch.exceptions import AuthorizationException, NotFoundError
 from pylastic import close_index, close_indices, open_index, \
     open_indices, create_index, update_alias, remove_alias, add_alias, \
-    is_index_closed, wait_for_index_green
+    is_index_closed, wait_for_index_green, add_aliases, remove_aliases
 from mock import Mock, patch
 from unittest import TestCase
 
@@ -164,6 +164,27 @@ class TestAddAlias(PylasticTest):
                                                   'add')
 
 
+class TestAddAliases(PylasticTest):
+    """
+    Test add_aliases
+    """
+
+
+    @patch('pylastic.helpers.add_alias')
+    def test_calls_add_alias_for_each_index_given(self, mock_add_alias):
+        indices = range(5)
+        failures = add_aliases(self.elastic_client, 'foo', indices)
+        self.assertEqual(5, mock_add_alias.call_count)
+
+
+    def test_returns_failures_instead_of_raising_exception(self):
+        self.elastic_client.indices.update_aliases.return_value = None
+        index = 'foo'
+        failures = add_aliases(self.elastic_client, index, [index])
+        self.assertEqual(1, len(failures))
+        self.assertEqual(index, failures[0])
+
+
 class TestRemoveAlias(PylasticTest):
     """
     Test remove_alias
@@ -177,6 +198,27 @@ class TestRemoveAlias(PylasticTest):
                                                   'foo',
                                                   'bar',
                                                   'remove')
+
+
+class TestRemoveAliases(PylasticTest):
+    """
+    Test remove_aliases
+    """
+
+
+    @patch('pylastic.helpers.remove_alias')
+    def test_calls_add_alias_for_each_index_given(self, mock_remove_alias):
+        indices = range(5)
+        failures = remove_aliases(self.elastic_client, 'foo', indices)
+        self.assertEqual(5, mock_remove_alias.call_count)
+
+
+    def test_returns_failures_instead_of_raising_exception(self):
+        self.elastic_client.indices.update_aliases.return_value = None
+        index = 'foo'
+        failures = remove_aliases(self.elastic_client, index, [index])
+        self.assertEqual(1, len(failures))
+        self.assertEqual(index, failures[0])
 
 
 class TestIsIndexClosed(PylasticTest):

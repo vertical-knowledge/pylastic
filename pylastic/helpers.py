@@ -118,6 +118,23 @@ def add_alias(elastic_client, alias, index):
     return update_alias(elastic_client, alias, index, 'add')
 
 
+def add_aliases(elastic_client, alias, indices):
+    """
+    Add multiple indices to a given alias
+    :param elastic_client: Elastic client
+    :param alias: Alias to which indices are to be added
+    :param indices: List of indices to add
+    :return: List of failed indices
+    """
+    failures = []
+    for index in indices:
+        try:
+            add_alias(elastic_client, alias, index)
+        except:
+            failures.append(index)
+    return failures
+
+
 def remove_alias(elastic_client, alias, index):
     """
     Remove an Elastic index from an Elastic alias
@@ -127,6 +144,23 @@ def remove_alias(elastic_client, alias, index):
     :return: Response from Elastic
     """
     return update_alias(elastic_client, alias, index, 'remove')
+
+
+def remove_aliases(elastic_client, alias, indices):
+    """
+    Remove multiple indices from a given alias
+    :param elastic_client: Elastic client
+    :param alias: Alias from which indices are to be removed
+    :param indices: List of indices to remove
+    :return: List of failed indices
+    """
+    failures = []
+    for index in indices:
+        try:
+            remove_alias(elastic_client, alias, index)
+        except:
+            failures.append(index)
+    return failures
 
 
 def is_index_closed(elastic_client, index):
