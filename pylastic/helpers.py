@@ -179,11 +179,12 @@ def is_index_closed(elastic_client, index):
     return False
 
 
-def wait_for_index_green(elastic_client, index):
+def wait_for_index_green(elastic_client, index, timeout=600):
     """
     Busy wait until the given index is green status
     :param elastic_client: Elastic client
     :param index: Index to check status on
+    :param timeout: Int number of seconds to wait_for_status
     :return: None
     """
     if not elastic_client.indices.exists(index=index):
@@ -194,6 +195,7 @@ def wait_for_index_green(elastic_client, index):
 
     response = elastic_client.cluster.health(index=index,
                                              wait_for_status=STATUS_GREEN,
-                                             timeout=600)
+                                             timeout='{}s'.format(timeout))
+
     if not response or not (response.get('status', '') == STATUS_GREEN):
         raise Exception('Index is not {}'.format(STATUS_GREEN))

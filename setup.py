@@ -4,7 +4,7 @@ __pkg_name__ = 'pylastic'
 
 import os
 
-version = '0.0.6'
+version = '0.0.7'
 
 base_dir = os.path.dirname(__file__)
 

@@ -264,7 +264,7 @@ class TestWaitForIndexGreen(PylasticTest):
         self.elastic_client.cluster.health.assert_called_once_with(
             index='foo',
             wait_for_status='green',
-            timeout=600)
+            timeout='600s')
 
     @patch('pylastic.helpers.is_index_closed', lambda x, y: False)
     def test_returns_when_index_green(self):
