@@ -192,6 +192,8 @@ def wait_for_index_green(elastic_client, index):
     if is_index_closed(elastic_client, index):
         raise Exception('Index is closed')
 
-    response = elastic_client.cluster.health(index=index, wait_for_status=STATUS_GREEN)
+    response = elastic_client.cluster.health(index=index,
+                                             wait_for_status=STATUS_GREEN,
+                                             timeout=600)
     if not response or not (response.get('status', '') == STATUS_GREEN):
         raise Exception('Index is not {}'.format(STATUS_GREEN))

@@ -259,6 +259,13 @@ class TestWaitForIndexGreen(PylasticTest):
         self.elastic_client.cluster.health.return_value = {'status': 'green'}
 
 
+    def test_calls_wait_for_status_with_correct_timeout(self):
+        wait_for_index_green(self.elastic_client, 'foo')
+        self.elastic_client.cluster.health.assert_called_once_with(
+            index='foo',
+            wait_for_status='green',
+            timeout=600)
+
     @patch('pylastic.helpers.is_index_closed', lambda x, y: False)
     def test_returns_when_index_green(self):
         self.assertEqual(None, wait_for_index_green(self.elastic_client, 'foo'))
@@ -268,6 +275,7 @@ class TestWaitForIndexGreen(PylasticTest):
     def test_raises_exception_if_index_does_not_exist(self):
         self.elastic_client.indices.exists.return_value = False
         self.assertRaises(Exception, wait_for_index_green, self.elastic_client, 'foo')
+        self.elastic_client.indices.exists.assert_called_once_with(index='foo')
 
 
     @patch('pylastic.helpers.is_index_closed', lambda x, y: True)
