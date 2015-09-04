@@ -4,10 +4,12 @@ Functions which wrap the Elastic client for convenience
 
 
 from elasticsearch.exceptions import AuthorizationException
-from patched_elastic import scan, bulk
 
 
 STATUS_GREEN = 'green'
+STATUS_YELLOW = 'yellow'
+STATUS_RED = 'red'
+
 
 def close_index(elastic_client, index):
     """
@@ -179,11 +181,12 @@ def is_index_closed(elastic_client, index):
     return False
 
 
-def wait_for_index_green(elastic_client, index, timeout=600):
+def wait_for_index(elastic_client, index, status=STATUS_YELLOW, timeout=600):
     """
-    Busy wait until the given index is green status
+    Busy wait until the given index is the given status
     :param elastic_client: Elastic client
     :param index: Index to check status on
+    :param status: Status to wait for
     :param timeout: Int number of seconds to wait_for_status
     :return: None
     """
@@ -194,8 +197,20 @@ def wait_for_index_green(elastic_client, index, timeout=600):
         raise Exception('Index is closed')
 
     response = elastic_client.cluster.health(index=index,
-                                             wait_for_status=STATUS_GREEN,
+                                             wait_for_status=status,
                                              timeout='{}s'.format(timeout))
 
-    if not response or not (response.get('status', '') == STATUS_GREEN):
-        raise Exception('Index is not {}'.format(STATUS_GREEN))
+    if not response or not (response.get('status', '') == status):
+        raise Exception('Index is not {}'.format(status))
+
+
+def wait_for_index_green(elastic_client, index, timeout=600):
+    """
+    Busy wait until the given index is green status.
+    This will be deprecated in the future. Use wait_for_index.
+    :param elastic_client: Elastic client
+    :param index: Index to check status on
+    :param timeout: Int number of seconds to wait_for_status
+    :return: None
+    """
+    wait_for_index(elastic_client, index, STATUS_GREEN, timeout)

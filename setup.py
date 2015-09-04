@@ -4,7 +4,7 @@ __pkg_name__ = 'pylastic'
 
 import os
 
-version = '0.0.7'
+version = '0.1.0'
 
 base_dir = os.path.dirname(__file__)
 
@@ -28,7 +28,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     tests_require=[
-        'elasticsearch',
+        'unittest2',
         'mock'
     ],
     test_suite='tests'
